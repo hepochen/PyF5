@@ -24,4 +24,7 @@ else:
 
 RESOURCE_FOLDER = os.path.join(APP_FOLDER, '_')
 
+if not os.path.isdir(RESOURCE_FOLDER):
+    RESOURCE_FOLDER = os.path.join(APP_FOLDER, '../Resources/_')
+
 CONFIG_PATH = config_path(APP_FOLDER)
