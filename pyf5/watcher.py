@@ -91,8 +91,26 @@ class ChangesWatcher(FileSystemEventHandler):
             else:
                 print 'skip compile', change.path, '(setting is off)'
 
+    def if_folder_changed(self, folder_path):
+        print folder_path
+        import sys
+        from watchdog.events import FileModifiedEvent
+        if sys.platform.startswith('win'):
+            return
+        now = time.time() - 2.5 # 2.5秒内的都算修改
+        if not os.path.isdir(folder_path):
+            return # ignore
+        for filename in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, filename)
+            if not os.path.isfile(file_path):
+                continue
+            modified_time = os.path.getmtime(file_path)
+            if modified_time > now:
+                self.on_any_event(FileModifiedEvent(file_path))
+
     def on_any_event(self, event):
         if event.is_directory:
+            self.if_folder_changed(event.src_path)
             return
 
         # 暂停文件变更的上报, 以免中途编译占用太长时间，而将事件提前返回
